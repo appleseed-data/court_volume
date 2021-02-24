@@ -28,7 +28,7 @@ Cook County [Open Data Portal](https://datacatalog.cookcountyil.gov/)
 
 Data was processed with Python, Pandas, and Facebook Prophet. The data was then uploaded to MongoDB where the following visualizations are hosted.
 
-Cook County Court [Backlog](https://charts.mongodb.com/charts-court_volume-nmlff/embed/charts?id=41d4d178-fcb6-4e0e-a4bf-687239cd72cc&theme=light)
+One way to think about the court backlog is to take the difference between the forecast and the actual counts. If the forecast is accurate and the actual counts reflect a reduced operational tempo, then the difference represents 'what would have been'.
 
 [![backlog](https://github.com/justinhchae/court_volume/blob/main/figures/Cook%20County%20Court%20Backlog%20During%20the%20Pandemic.png)](https://charts.mongodb.com/charts-court_volume-nmlff/embed/charts?id=41d4d178-fcb6-4e0e-a4bf-687239cd72cc&theme=light)
 
