@@ -124,10 +124,13 @@ def run_prophet_dispo(train, ds_col='ds', predict_col='yhat'):
 conda env create -f environment.yml
 ```
 
-2. Should work - pip install -r requirements.txt
+2. Should work, but I had some issues with starting from requirements.
+
+```terminal
+pip install -r requirements.txt
+```
+
+4. See the [conda docs](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)
 
 
-3. See the [conda docs](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)
-
-
-4. Run main.py which will read the source file, process it, and generate forecasts. You know it worked if the script generates .pickle files and says that the forecasts have finished running. 
+5. Run main.py which will read the source file, process it, and generate forecasts. You know it worked if the script generates .pickle files and says that the forecasts have finished running. 
