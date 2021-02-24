@@ -32,6 +32,8 @@ One way to think about the court backlog is to take the difference between the f
 
 [![backlog](https://github.com/justinhchae/court_volume/blob/main/figures/Cook%20County%20Court%20Backlog%20During%20the%20Pandemic.png)](https://charts.mongodb.com/charts-court_volume-nmlff/embed/charts?id=41d4d178-fcb6-4e0e-a4bf-687239cd72cc&theme=light)
 
-How is the forecast created? Is it accurate? Forecasting is notoriously difficult and is never perfect but we can make reasonable attempts at it. We learned a model of Facebook
+How is the forecast created? Is it accurate? Forecasting is notoriously difficult and is never perfect but we can make reasonable attempts at it. We learned a model of trends in both arrests and court volumes with Facebook Prophet. Then, using the model of past data, we forecasted future trends for periods before and during the pandemic. 
+
+As the visualization shows, the model forecasts a trend line that is similar to the actual counts for historic periods. With an accurate model, going into the pandemic months, we can see that the trend indicates a count of cases that would have been disposed.
 
 [![timeline](https://github.com/justinhchae/court_volume/blob/main/figures/Cook%20County%20Court%20Dispositions%20and%20Felony%20Arrest%20Volumes.png)](https://charts.mongodb.com/charts-court_volume-nmlff/embed/charts?id=5efdfb3e-a237-41e6-b353-0f697aa0ec2e&theme=light)
