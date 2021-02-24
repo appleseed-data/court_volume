@@ -118,13 +118,19 @@ def run_prophet_dispo(train, ds_col='ds', predict_col='yhat'):
 
 ## How to Get Started With this Code
 
-1. Will most likely work best - create a new conda environment from the environment.yml file
+1. Clone the repo - any way works, but try this:
+
+```terminal
+git clone https://github.com/justinhchae/court_volume
+```
+
+2. Will most likely work best - create a new conda environment from the environment.yml file
 
 ```terminal
 conda env create -f environment.yml
 ```
 
-2. Should work, but I had some issues with starting from requirements.
+3. Should work, but I had some issues with starting from requirements.
 
 ```terminal
 pip install -r requirements.txt
