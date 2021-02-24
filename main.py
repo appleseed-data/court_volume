@@ -9,20 +9,20 @@ c = Columns()
 
 if __name__ == '__main__':
 
-    dispositions = run_disposition_pipeline()
-    prep_disposition_data(dispositions)
-    arrests = run_arrests_pipeline()
-    prep_arrest_data(arrests)
+    # dispositions = run_disposition_pipeline()
+    # prep_disposition_data(dispositions)
+    # arrests = run_arrests_pipeline()
+    # prep_arrest_data(arrests)
+    #
+    # dispo_data = predict_disposition_data()
+    # arrest_data = predict_arrest_data()
+    #
+    # p = Pool(CPUs)
+    # dispo_predictions = list(p.imap(run_prophet_dispo, dispo_data))
+    # p.close()
+    # p.join()
 
-    dispo_data = predict_disposition_data()
-    arrest_data = predict_arrest_data()
-
-    p = Pool(CPUs)
-    dispo_predictions = list(p.imap(run_prophet_dispo, dispo_data))
-    p.close()
-    p.join()
-
-    export_disposition_data(dispo_predictions)
+    # export_disposition_data(dispo_predictions)
 
     df = prep_analysis_for_mongo()
     # run_mongo_pipeline(df)
@@ -30,6 +30,7 @@ if __name__ == '__main__':
     df = estimate_court_backlog()
     # run_mongo_pipeline(df, collection_name='court_backlog_estimate')
 
+    print(df)
 
 
 

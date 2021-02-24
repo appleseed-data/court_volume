@@ -26,7 +26,7 @@ Cook County [Open Data Portal](https://datacatalog.cookcountyil.gov/)
 
 ## Data Visuals
 
-Data was processed with Python, Pandas, and Facebook Prophet. The data was then uploaded to MongoDB where the following visualizations are hosted.
+Data was processed with Python, Pandas, and [Facebook Prophet](https://facebook.github.io/prophet/). The data was then uploaded to MongoDB where the following visualizations are hosted.
 
 One way to think about the court backlog is to take the difference between the forecast and the actual counts. If the forecast is accurate and the actual counts reflect a reduced operational tempo, then the difference represents 'what would have been'.
 
@@ -37,3 +37,8 @@ How is the forecast created? Is it accurate? Forecasting is notoriously difficul
 As the visualization shows, the model forecasts a trend line that is similar to the actual counts for historic periods. With an accurate model, going into the pandemic months, we can see that the trend indicates a count of cases that would have been disposed.
 
 [![timeline](https://github.com/justinhchae/court_volume/blob/main/figures/Cook%20County%20Court%20Dispositions%20and%20Felony%20Arrest%20Volumes.png)](https://charts.mongodb.com/charts-court_volume-nmlff/embed/charts?id=5efdfb3e-a237-41e6-b353-0f697aa0ec2e&theme=light)
+
+
+## Disclaimer
+
+Disclaimer: "This site provides applications using data that has been modified for use from its original source, www.cityofchicago.org, the official website of the City of Chicago.  The City of Chicago makes no claims as to the content, accuracy, timeliness, or completeness of any of the data provided at this site.  The data provided at this site is subject to change at any time.  It is understood that the data provided at this site is being used at one’s own risk."
