@@ -115,3 +115,19 @@ def run_prophet_dispo(train, ds_col='ds', predict_col='yhat'):
 7. The disposition data forecast is a special case - predictions for 4 types of disposition events are run in paralell with multi-processing to improve performance but is not necessary. Disable pooling if pooling is not desired.
 
 8. The source project terminates with an upload to MongoDB for data visualization, but further analysis can be continued without MongoDB.
+
+## How to Get Started With this Code
+
+1. Will most likely work best - create a new conda environment from the environment.yml file
+
+```terminal
+conda env create -f environment.yml
+```
+
+2. Should work - pip install -r requirements.txt
+
+
+3. See the [conda docs](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)
+
+
+4. Run main.py which will read the source file, process it, and generate forecasts. You know it worked if the script generates .pickle files and says that the forecasts have finished running. 
