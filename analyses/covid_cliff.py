@@ -222,7 +222,7 @@ def predict_arrest_data():
     return df
 
 
-def covid_cliff_analysis():
+def prep_analysis_for_mongo():
     court_df = pd.read_pickle('data/covid_cliff_court_data_predicted.pickle')
     arrest_df = pd.read_pickle('data/covid_cliff_arrest_data_predicted.pickle')
     
@@ -232,13 +232,31 @@ def covid_cliff_analysis():
 
     df = df.drop(columns=['arrest_date'])
 
-    court_df = court_df.set_index(c.disposition_date)
-    arrest_df = arrest_df.set_index('arrest_date')
+    df['case_count'] = list(zip(df[c.charge_disposition_cat],df['case_count']))
+    df['predicted_case_count'] = list(zip(df[c.charge_disposition_cat],df['predicted_case_count']))
 
-    plt.figure()
-    sns.lineplot(data=court_df)
-    sns.lineplot(data=arrest_df)
-    plt.show()
+    df['arrest_count'] = list(zip(df['arrest_type'], df['arrest_count']))
+    df['predicted_arrest_count'] = list(zip(df['arrest_type'], df['predicted_arrest_count']))
+
+    df.drop(columns=['arrest_type', c.charge_disposition_cat], inplace=True)
+
 
     return df
+
+
+def estimate_court_backlog():
+    court_df = pd.read_pickle('data/covid_cliff_court_data_predicted.pickle')
+    arrest_df = pd.read_pickle('data/covid_cliff_arrest_data_predicted.pickle')
+
+    df = court_df[court_df[c.disposition_date] > pd.to_datetime("2020-02-01")].copy()
+    df['backlog'] = df['predicted_case_count'] - df['case_count']
+
+    df = df.reset_index(drop=True)
+
+    return df
+
+
+
+
+
 
