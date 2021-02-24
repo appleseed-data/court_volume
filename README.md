@@ -62,8 +62,12 @@ df = pd.read_pickle('data/dispositions.bz2')
 df = pd.read_pickle('data/arrests_analysis_public.pickle')
 ```
 
-4. Records are aggregated and filtered for the scope of this analysis and then used to learn a model of time series trends.
+4. From analyses/covid_cliff.py, records are aggregated and filtered for the scope of this analysis and then used to learn a model of time series trends.
 
-5. The model forecasts (the predictions) are combined with actual data.
+5. Concept of Predictions: For court data, train sequence is a period of two years with daily counts of disposition categories; the following year is forecasted. For arrest data, train sequence is at a monthly-level within a range from 2014 to 2018 with prediction from 2018 to 2020.
 
-6. The source project terminates with an upload to MongoDB for data visualization, but further analysis can be continued without MongoDB.
+6. The model forecasts (the predictions) are combined with actual data.
+
+7. The disposition data forecast is a special case - predictions for 4 types of disposition events are run in paralell with multi-processing to improve performance but is not necessary. Disable pooling if pooling is not desired.
+
+8. The source project terminates with an upload to MongoDB for data visualization, but further analysis can be continued without MongoDB.
