@@ -28,3 +28,4 @@ Cook County [Open Data Portal](https://datacatalog.cookcountyil.gov/)
 
 Cook County Court [Backlog](https://charts.mongodb.com/charts-court_volume-nmlff/embed/charts?id=41d4d178-fcb6-4e0e-a4bf-687239cd72cc&theme=light)
 
+![backlog](figures/Cook County Court Backlog During the Pandemic.png)
