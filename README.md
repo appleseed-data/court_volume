@@ -22,7 +22,7 @@ Motivation: Identify the potential impact of diposing cases by estimating the co
 
 ## Data Source
 
-Cook County Open Data Portal
+Cook County [Open Data Portal](https://datacatalog.cookcountyil.gov/)
 
 ## Data Visuals
 
