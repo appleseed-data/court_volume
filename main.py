@@ -1,6 +1,8 @@
 from utils.pipelines_data import *
 from analyses.covid_cliff import *
 from utils.config import Columns
+import logging
+#TODO replace print statements with logging
 
 from multiprocessing import Pool, cpu_count
 
