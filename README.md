@@ -8,7 +8,7 @@ This project analyzes data about Court operations in Cook County during the COVI
 
 Central Question to be answered: How many cases would have been disposed during the pandemic that would have been resolved in a normal year?
 
-Motivation: Identify the potential impact of diposing cases by estimating the court backlog.
+Motivation: Identify the potential impact of disposing cases by estimating the court backlog.
 
 ## Core Concepts
 
