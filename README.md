@@ -59,7 +59,7 @@ df = pd.read_pickle('data/dispositions.bz2')
 ... or for arrest data
 
 ```python
-df = pd.read_pickle('data/arrests_analysis_public.pickle')
+df = pd.read_pickle('data/arrests_analysis_public.bz2')
 ```
 
 4. From analyses/covid_cliff.py, records are aggregated and filtered for the scope of this analysis and then used to learn a model of time series trends.
