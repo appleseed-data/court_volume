@@ -26,6 +26,6 @@ if __name__ == '__main__':
 
     df = covid_cliff_analysis()
 
-    run_mongo_pipeline(df)
+    # run_mongo_pipeline(df)
 
 
