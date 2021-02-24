@@ -169,6 +169,7 @@ def prep_disposition_data(x):
 
 
 def predict_disposition_data():
+    print('------ Ran court forecast')
     df = pd.read_pickle('data/covid_cliff_disposition_data.pickle')
 
     grouper = pd.Grouper(key=c.disposition_date, freq='D')
@@ -241,6 +242,7 @@ def run_prophet_arrest(x, y, ds_col='ds', predict_col='yhat'):
 
 
 def predict_arrest_data():
+    print('------ Ran arrest forecast')
     df = pd.read_pickle('data/covid_cliff_arrest_data.pickle')
 
     df = df.rename(columns={'date':'ds'
@@ -284,6 +286,7 @@ def prep_analysis_for_mongo():
 
 
 def estimate_court_backlog():
+    print('------ Generated backlog estimates')
     court_df = pd.read_pickle('data/covid_cliff_court_data_predicted.pickle')
     arrest_df = pd.read_pickle('data/covid_cliff_arrest_data_predicted.pickle')
 
