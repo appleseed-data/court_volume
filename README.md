@@ -50,8 +50,20 @@ A few high-level notes about the scripts used in this analysis.
 2. Functions packaged into pipelines in utils/pipelines_data.py
 3. Disposition Data pipeline starts with source file, dispositions.bz2 - this file is a compressed pandas pickle file which can be read with Python with
 
-```
+```python
 import pandas as pd
 
 df = pd.read_pickle('data/dispositions.bz2')
 ```
+
+... or for arrest data
+
+```python
+df = pd.read_pickle('data/arrests_analysis_public.pickle')
+```
+
+4. Records are aggregated and filtered for the scope of this analysis and then used to learn a model of time series trends.
+
+5. The model forecasts (the predictions) are combined with actual data.
+
+6. The source project terminates with an upload to MongoDB for data visualization, but further analysis can be continued without MongoDB.
