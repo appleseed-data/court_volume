@@ -24,13 +24,14 @@ if __name__ == '__main__':
 
     export_disposition_data(dispo_predictions)
 
-    df = prep_analysis_for_mongo()
-    # run_mongo_pipeline(df)
+    df_mongo = prep_analysis_for_mongo()
+    # run_mongo_pipeline(df_mongo)
 
-    df = estimate_court_backlog()
+    df_backlog = estimate_court_backlog()
     # run_mongo_pipeline(df, collection_name='court_backlog_estimate')
 
-    print(df)
+
+
 
 
 

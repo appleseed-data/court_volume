@@ -12,6 +12,8 @@ data_folder = 'data/'
 np_days = np.timedelta64(1, 'D')
 np_hours = np.timedelta64(1, 'h')
 
+# git rm --cached <file>
+
 def get_source_file(filename):
     filepath = data_folder + filename
     if '.csv' in filename:
