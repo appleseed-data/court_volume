@@ -16,15 +16,22 @@ np_hours = np.timedelta64(1, 'h')
 # git rm --cached <file>
 
 def get_source_file(filename):
+    """
+    a convenience wrapper for reading dataframes
+    """
     filepath = data_folder + filename
     if '.csv' in filename:
         df = pd.read_csv(filepath, low_memory=False)
+        return df
     elif '.pickle' in filename or '.bz2' in filename:
         df = pd.read_pickle(filepath)
-
-    return df
+        return df
 
 class Columns():
+    """
+    a custom class to call column names or data fields common to cook county court data
+    """
+
     def __init__(self):
         self.act = 'act'
         self.age_at_incident = 'age_at_incident'
@@ -539,6 +546,11 @@ def map_disposition_categories(df, col1=None):
     return df
 
 def reduce_precision(df, run_spellcheck=False):
+    """
+    :param df: attempts to auto-optimize a dataframe by applying least precision to each col type
+    :return: the same dataframe but with different col dtypes, if applicable
+    """
+
     print('------ Optimize DataFrame Memory')
 
     cols_to_convert = []
@@ -622,6 +634,9 @@ def reduce_precision(df, run_spellcheck=False):
     return df
 
 def max_disp_charge(df):
+    """
+    for each disposition charge and person, return the most 'severe' charge
+    """
     charged_class_code = 'charged_class_category'
     cols = [c.case_id, c.case_participant_id, c.received_date, c.updated_offense_category,
             c.disposition_charged_class]

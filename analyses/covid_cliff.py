@@ -157,6 +157,7 @@ def eval_prophet(ytrue, yhat):
 
     return df, error
 
+
 def prep_disposition_data(x):
     df = ov1_disposition(x)
     df = df[~(df[c.charge_disposition_cat].isin(restricted_list))].copy()
@@ -165,6 +166,7 @@ def prep_disposition_data(x):
 
     df.to_pickle('data/covid_cliff_disposition_data.pickle')
     df.to_csv('data/covid_cliff_disposition_data.csv')
+
 
 def predict_disposition_data():
     df = pd.read_pickle('data/covid_cliff_disposition_data.pickle')
@@ -179,6 +181,7 @@ def predict_disposition_data():
     data = prep_prophet(df)
 
     return data
+
 
 def export_disposition_data(predictions):
     df = pd.concat([pd.concat(i) for i in predictions])
@@ -205,10 +208,12 @@ def export_disposition_data(predictions):
 
 def prep_arrest_data(df):
     felony_flag = "F"
+    frequency = "M"
+
     df = df[df['charge_1_type'] == felony_flag].copy()
 
     df['date'] = pd.to_datetime(df['arrest_year'].astype(str) + '-' + df['arrest_month'].astype(str) + '-01')
-    df = df[['date', 'charge_1_class']].groupby([pd.Grouper(key='date', freq='M')]).agg('count').reset_index()
+    df = df[['date', 'charge_1_class']].groupby([pd.Grouper(key='date', freq=frequency)]).agg('count').reset_index()
     df = df.sort_values('date')
     df['type'] = 'Felony Arrest'
     df.rename(columns={'charge_1_class': 'count'}, inplace=True)
@@ -233,6 +238,7 @@ def run_prophet_arrest(x, y, ds_col='ds', predict_col='yhat'):
     df[predict_col] = np.where(df[predict_col] < 0, 0, df[predict_col])
 
     return df
+
 
 def predict_arrest_data():
     df = pd.read_pickle('data/covid_cliff_arrest_data.pickle')

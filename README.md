@@ -66,7 +66,51 @@ df = pd.read_pickle('data/arrests_analysis_public.pickle')
 
 5. Concept of Predictions: For court data, train sequence is a period of two years with daily counts of disposition categories; the following year is forecasted. For arrest data, train sequence is at a monthly-level within a range from 2014 to 2018 with prediction from 2018 to 2020.
 
-6. The model forecasts (the predictions) are combined with actual data.
+6. The model forecasts (the predictions) are combined with actual data. The primary forecasting script is provided in this readme for quick reference.
+
+```python
+def run_prophet_dispo(train, ds_col='ds', predict_col='yhat'):
+    """
+    :param train: a 2-tuple of (data, data category), idx 0 comprising a pandas dataframe, idx 1 a string
+    :param ds_col: default to 'ds' per facebook prophet api
+    :param predict_col: default to 'yhat' per facebook prophet api
+    :return:
+    """
+
+    # data, a 2-tuple within train
+    data = train[0]
+    # x_i is the train data y_i is the target data
+    x_i, y_i = data
+
+    results = []
+
+    for idx, x in enumerate(x_i):
+        # store current target by indexing y_i with x_i
+        y = y_i[idx]
+
+        m = Prophet(uncertainty_samples=False)
+
+        # fit model to current x and supress annoying output
+        with suppress_stdout_stderr():
+            m.fit(x)
+
+        # make a dataframe for future forecast based on current y index
+        future_idx = y[[ds_col]].reset_index(drop=True)
+
+        # return a prediction based on the index and slice only desired cols
+        yhat = m.predict(future_idx)[[ds_col, predict_col]]
+
+        # unify targets and predictions into a single dataframe
+        df = pd.merge(y, yhat, left_on=ds_col, right_on=ds_col)
+
+        # intervene with predictions, any negative number is 0
+        df[predict_col] = np.where(df[predict_col] < 0, 0, df[predict_col])
+
+        # capture each iteration in a list of dataframes
+        results.append(df)
+
+    return results
+```
 
 7. The disposition data forecast is a special case - predictions for 4 types of disposition events are run in paralell with multi-processing to improve performance but is not necessary. Disable pooling if pooling is not desired.
 
