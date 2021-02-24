@@ -3,6 +3,9 @@ import os
 import re
 import numpy as np
 
+from pymongo import MongoClient
+from decouple import config
+
 pd.set_option('display.max_columns', None)
 
 data_folder = 'data/'
@@ -658,3 +661,32 @@ def ov1_disposition(df):
     print('------ Returning Disposition Data for Most Severe Charge in a Given Case.')
 
     return df
+
+class MakeMongo():
+    def __init__(self):
+        self.pw = config('PASSWORD')
+        self.db_name = config('DATABASE_NAME')
+        self.un = config('USERNAME')
+        self.host = config('HOST')
+        """ References
+        https://able.bio/rhett/how-to-set-and-get-environment-variables-in-python--274rgt5
+        """
+
+    def insert_df(self, database=None, collection=None, df=None):
+        header = "mongodb+srv://"
+
+        connection_string = str(header+self.un+":"+self.pw+"@"+self.host+"/"+"?retryWrites=true&w=majority")
+
+        client = MongoClient(connection_string)
+
+        if database:
+            db = client[database]
+        else:
+            db = client[self.db_name]
+
+
+        if df is not None and collection:
+            data_dict = df.to_dict("records")
+            db[collection].delete_many({})
+            db[collection].insert(data_dict)
+            print('Inserted DB to Collection')

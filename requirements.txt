@@ -5,3 +5,5 @@ pystan
 fbprophet
 sklearn
 plotly
+python-decouple
+pymongo[srv]

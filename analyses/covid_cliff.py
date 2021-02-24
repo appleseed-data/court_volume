@@ -155,6 +155,18 @@ def export_disposition_data(predictions):
         , 'yhat': 'predicted_case_count'})
 
     df = df[[c.disposition_date, 'case_count', c.charge_disposition_cat, 'predicted_case_count']]
+
+    grouper = pd.Grouper(key=c.disposition_date, freq='M')
+
+    df = df.groupby([c.charge_disposition_cat, grouper]).agg({'case_count':'sum','predicted_case_count':'sum'})
+
+    df = df.reset_index()
+
+    df = df.sort_values(by=[c.disposition_date])
+    df = df.reset_index(drop=True)
+
+    df = df[[c.disposition_date, 'case_count', c.charge_disposition_cat, 'predicted_case_count']]
+
     df.to_csv('data/covid_cliff_court_data_predicted.csv')
     df.to_pickle('data/covid_cliff_court_data_predicted.pickle')
 
@@ -195,14 +207,15 @@ def predict_arrest_data():
     df = df.rename(columns={'date':'ds'
                             ,'count':'y'})
 
-    x = df[df['ds'].dt.year < 2018]
-    y = df[df['ds'].dt.year >= 2018]
+    x = df[df['ds'].dt.year < 2019]
+    y = df[df['ds'].dt.year >= 2014]
 
     results = run_prophet_arrest(x,y)
 
     df = results.rename(columns={'ds':'arrest_date'
-                                 ,'y':'arrest_count'
-                                 ,'yhat':'predicted_arrest_count'})
+                                ,'y':'arrest_count'
+                                ,'yhat':'predicted_arrest_count'
+                                ,'type':'arrest_type' })
 
     df.to_csv('data/covid_cliff_arrest_data_predicted.csv')
     df.to_pickle('data/covid_cliff_arrest_data_predicted.pickle')
@@ -212,6 +225,20 @@ def predict_arrest_data():
 def covid_cliff_analysis():
     court_df = pd.read_pickle('data/covid_cliff_court_data_predicted.pickle')
     arrest_df = pd.read_pickle('data/covid_cliff_arrest_data_predicted.pickle')
+    
+    df = pd.merge(court_df, arrest_df, left_on=c.disposition_date, right_on='arrest_date')
 
-    print(court_df)
-    print(arrest_df)
+    df = df.rename(columns={c.disposition_date:'date'})
+
+    df = df.drop(columns=['arrest_date'])
+
+    court_df = court_df.set_index(c.disposition_date)
+    arrest_df = arrest_df.set_index('arrest_date')
+
+    plt.figure()
+    sns.lineplot(data=court_df)
+    sns.lineplot(data=arrest_df)
+    plt.show()
+
+    return df
+

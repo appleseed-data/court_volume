@@ -16,14 +16,16 @@ if __name__ == '__main__':
 
     # dispo_data = predict_disposition_data()
     # arrest_data = predict_arrest_data()
-
+    #
     # p = Pool(CPUs)
     # dispo_predictions = list(p.imap(run_prophet_dispo, dispo_data))
     # p.close()
     # p.join()
-
+    #
     # export_disposition_data(dispo_predictions)
 
-    covid_cliff_analysis()
+    df = covid_cliff_analysis()
+
+    run_mongo_pipeline(df)
 
 

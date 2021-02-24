@@ -41,3 +41,6 @@ def run_disposition_pipeline(filename='dispositions.bz2'):
 def run_arrests_pipeline(filename='arrests_analysis_public.pickle'):
     df = get_source_file(filename)
     return df
+
+def run_mongo_pipeline(df, collection_name='court_arrest_volumes'):
+    MakeMongo().insert_df(collection=collection_name, df=df)
