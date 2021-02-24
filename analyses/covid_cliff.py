@@ -6,11 +6,8 @@ import os
 from sklearn.metrics import mean_squared_error
 from fbprophet import Prophet
 
-
-
 from utils.config import Columns
 from utils.config import ov1_disposition
-
 
 c = Columns()
 
@@ -112,7 +109,6 @@ def prep_prophet(x):
 
     for name, group in df:
         # loop through each data from of group
-
         # hard-coded values for window and step size
         year_idx_start = 2011
         window_size = 2
@@ -148,6 +144,7 @@ def prep_prophet(x):
     return data_list
 
 def eval_prophet(ytrue, yhat):
+
     df = pd.merge(ytrue, yhat, left_on='ds', right_on='ds')
     error = round(mean_squared_error(df['y'].values, df['yhat'].values),3)
 
@@ -157,6 +154,7 @@ def eval_prophet(ytrue, yhat):
     plt.show()
 
     print(error)
+
     return df, error
 
 def prep_disposition_data(x):
@@ -164,6 +162,7 @@ def prep_disposition_data(x):
     df = df[~(df[c.charge_disposition_cat].isin(restricted_list))].copy()
     df[c.charge_disposition_cat] = df[c.charge_disposition_cat].cat.remove_unused_categories()
     df = df[[c.disposition_date, c.charge_disposition_cat, c.case_length]]
+
     df.to_pickle('data/covid_cliff_disposition_data.pickle')
     df.to_csv('data/covid_cliff_disposition_data.csv')
 
@@ -184,8 +183,8 @@ def predict_disposition_data():
 def export_disposition_data(predictions):
     df = pd.concat([pd.concat(i) for i in predictions])
     df = df.rename(columns={'ds': c.disposition_date
-        , 'y': 'case_count'
-        , 'yhat': 'predicted_case_count'})
+                            ,'y': 'case_count'
+                            ,'yhat': 'predicted_case_count'})
 
     df = df[[c.disposition_date, 'case_count', c.charge_disposition_cat, 'predicted_case_count']]
 
@@ -205,7 +204,8 @@ def export_disposition_data(predictions):
 
 
 def prep_arrest_data(df):
-    df = df[df['charge_1_type'] == "F"].copy()
+    felony_flag = "F"
+    df = df[df['charge_1_type'] == felony_flag].copy()
 
     df['date'] = pd.to_datetime(df['arrest_year'].astype(str) + '-' + df['arrest_month'].astype(str) + '-01')
     df = df[['date', 'charge_1_class']].groupby([pd.Grouper(key='date', freq='M')]).agg('count').reset_index()
@@ -252,6 +252,7 @@ def predict_arrest_data():
 
     df.to_csv('data/covid_cliff_arrest_data_predicted.csv')
     df.to_pickle('data/covid_cliff_arrest_data_predicted.pickle')
+
     return df
 
 
@@ -272,7 +273,6 @@ def prep_analysis_for_mongo():
     df['predicted_arrest_count'] = list(zip(df['arrest_type'], df['predicted_arrest_count']))
 
     df.drop(columns=['arrest_type', c.charge_disposition_cat], inplace=True)
-
 
     return df
 

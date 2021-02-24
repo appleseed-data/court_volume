@@ -12,6 +12,7 @@ data_folder = 'data/'
 np_days = np.timedelta64(1, 'D')
 np_hours = np.timedelta64(1, 'h')
 
+# a helpful note to remove stuff from git
 # git rm --cached <file>
 
 def get_source_file(filename):
@@ -473,7 +474,6 @@ def classer(df, col_name, echo=False):
 
     if col_name == 'judge' or col_name == 'sentence_judge':
         try:
-            # df[col_name] = df[col_name].fillna(value='Judge Not Specified')
             df[col_name] = df[col_name].str.strip()
             df[col_name] = df[col_name].str.replace('\.', '')
             df[col_name] = df[col_name].str.replace('\s+', ' ')
