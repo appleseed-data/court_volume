@@ -44,3 +44,14 @@ Disclaimer: "This site provides applications using data that has been modified f
 
 ## Code
 
+A few high-level notes about the scripts used in this analysis.
+
+1. Helper and data cleaning functions in utils/config.py
+2. Functions packaged into pipelines in utils/pipelines_data.py
+3. Disposition Data pipeline starts with source file, dispositions.bz2 - this file is a compressed pandas pickle file which can be read with Python with
+
+```
+import pandas as pd
+
+df = pd.read_pickle('data/dispositions.bz2')
+```
