@@ -48,28 +48,43 @@ class suppress_stdout_stderr(object):
 
 
 def run_prophet_dispo(train, ds_col='ds', predict_col='yhat'):
+    """
+    :param train: a 2-tuple of (data, data category), idx 0 comprising a pandas dataframe, idx 1 a string
+    :param ds_col: default to 'ds' per facebook prophet api
+    :param predict_col: default to 'yhat' per facebook prophet api
+    :return:
+    """
 
+    # data, a 2-tuple within train
     data = train[0]
+    # x_i is the train data y_i is the target data
     x_i, y_i = data
 
     results = []
 
     for idx, x in enumerate(x_i):
+        # store current target by indexing y_i with x_i
         y = y_i[idx]
 
         m = Prophet(uncertainty_samples=False)
 
+        # fit model to current x and supress annoying output
         with suppress_stdout_stderr():
             m.fit(x)
 
+        # make a dataframe for future forecast based on current y index
         future_idx = y[[ds_col]].reset_index(drop=True)
 
+        # return a prediction based on the index and slice only desired cols
         yhat = m.predict(future_idx)[[ds_col, predict_col]]
 
+        # unify targets and predictions into a single dataframe
         df = pd.merge(y, yhat, left_on=ds_col, right_on=ds_col)
 
+        # intervene with predictions, any negative number is 0
         df[predict_col] = np.where(df[predict_col] < 0, 0, df[predict_col])
 
+        # capture each iteration in a list of dataframes
         results.append(df)
 
     return results
@@ -78,15 +93,27 @@ def decimal_str(x: float, decimals: int = 10) -> str:
     return format(x, f".{decimals}f").lstrip().rstrip('0')
 
 def prep_prophet(x):
+    """
+    :param x: a dataframe having data for train and test (everything)
+    :return: a list of 2-tuples having (dataframe, string) as data and data label for prophet
+    """
+
+    # map for col names per facebook api
     key_map = {c.disposition_date: 'ds', 'count': 'y'}
 
+    # apply col name remap
     df = x.rename(columns=key_map)
+
+    # group data by desired category
     df = df.groupby(c.charge_disposition_cat)
 
+    # init empty list for output
     data_list = []
 
     for name, group in df:
+        # loop through each data from of group
 
+        # hard-coded values for window and step size
         year_idx_start = 2011
         window_size = 2
         step_size = 1
@@ -98,18 +125,24 @@ def prep_prophet(x):
 
         df = group.copy()
 
+        # within each loop, extract data frame into train and test pairs
         for step in steps:
+            # train on two years, predict the third, break when year 3 is at end of index
             if step + 3 > max(steps):
                 break
 
+            # in the first loop, 2011 < x.dt.year < 2013 and y.dt.year == 2014
             X = df[(df['ds'].dt.year >= step) & (df['ds'].dt.year <= step + window_size)].reset_index(drop=True)
             Y = df[(df['ds'].dt.year == step + window_size + step_size)].reset_index(drop=True)
 
+            # save sequenced dataframes in lists
             x_i.append(X)
             y_i.append(Y)
 
+        # save data as 2-tuple pairs
         data = (x_i, y_i)
 
+        # accumulate data as a list of tuples
         data_list.append((data, name))
 
     return data_list
