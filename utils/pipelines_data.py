@@ -38,7 +38,7 @@ def run_disposition_pipeline(filename='dispositions.bz2'):
     return df
 
 
-def run_arrests_pipeline(filename='arrests_analysis_public.pickle'):
+def run_arrests_pipeline(filename='arrests_analysis_public.bz2'):
     df = get_source_file(filename)
     return df
 
