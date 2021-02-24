@@ -1,0 +1,7 @@
+pandas
+matplotlib
+seaborn
+pystan
+fbprophet
+sklearn
+plotly
