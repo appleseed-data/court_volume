@@ -127,4 +127,4 @@ dmypy.json
 # local stuff
 .idea/
 .DS_Store
-.csv
+*.csv
