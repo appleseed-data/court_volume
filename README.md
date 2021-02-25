@@ -24,6 +24,10 @@ Motivation: Identify the potential impact of disposing cases by estimating the c
 
 Cook County [Open Data Portal](https://datacatalog.cookcountyil.gov/)
 
+Court data downloaded 22 February 2021. 
+
+Arrest data from October 2020.
+
 ## Data Visuals
 
 Data was processed with Python, Pandas, and [Facebook Prophet](https://facebook.github.io/prophet/). The data was then uploaded to MongoDB where the following visualizations are hosted.
