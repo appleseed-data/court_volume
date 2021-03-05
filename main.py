@@ -6,10 +6,10 @@ import logging
 
 from multiprocessing import Pool, cpu_count
 
-CPUs = cpu_count() - 2
-c = Columns()
 
 if __name__ == '__main__':
+    CPUs = cpu_count() // 2
+    c = Columns()
 
     dispositions = run_disposition_pipeline()
     prep_disposition_data(dispositions)
@@ -28,9 +28,11 @@ if __name__ == '__main__':
 
     df_mongo = prep_analysis_for_mongo()
     # run_mongo_pipeline(df_mongo)
+    df_mongo.to_csv('data/arrest_volume.csv')
 
     df_backlog = estimate_court_backlog()
     # run_mongo_pipeline(df, collection_name='court_backlog_estimate')
+    df_backlog.to_csv('data/court_backlog.csv')
 
 
 

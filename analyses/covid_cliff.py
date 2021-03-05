@@ -11,8 +11,6 @@ from utils.config import ov1_disposition
 
 c = Columns()
 
-restricted_list = ['Death', 'Mental Health', 'Other']
-
 class suppress_stdout_stderr(object):
     '''
     # https://github.com/facebook/prophet/issues/223
@@ -159,6 +157,8 @@ def eval_prophet(ytrue, yhat):
 
 
 def prep_disposition_data(x):
+    restricted_list = ['Death', 'Mental Health', 'Other']
+
     df = ov1_disposition(x)
     df = df[~(df[c.charge_disposition_cat].isin(restricted_list))].copy()
     df[c.charge_disposition_cat] = df[c.charge_disposition_cat].cat.remove_unused_categories()
