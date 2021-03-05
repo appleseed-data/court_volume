@@ -203,7 +203,7 @@ def export_disposition_data(predictions):
 
     df = df[[c.disposition_date, 'case_count', c.charge_disposition_cat, 'predicted_case_count']]
 
-    df.to_csv('data/covid_cliff_court_data_predicted.csv')
+    df.to_csv('data/covid_cliff_court_data_predicted.csv', index=False)
     df.to_pickle('data/covid_cliff_court_data_predicted.pickle')
 
 
@@ -219,8 +219,8 @@ def prep_arrest_data(df):
     df['type'] = 'Felony Arrest'
     df.rename(columns={'charge_1_class': 'count'}, inplace=True)
 
+    df.to_csv('data/covid_cliff_arrest_data.csv', index=False)
     df.to_pickle('data/covid_cliff_arrest_data.pickle')
-    df.to_csv('data/covid_cliff_arrest_data.csv')
 
 
 def run_prophet_arrest(x, y, ds_col='ds', predict_col='yhat'):

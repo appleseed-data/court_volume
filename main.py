@@ -5,7 +5,10 @@ import logging
 #TODO replace print statements with logging
 
 from multiprocessing import Pool, cpu_count
-
+# deactivate current: conda deactivate
+# delete conda env: conda remove --name court_volume --all
+# restore conda env: conda env create -f environment.yml
+# activate new env: conda activate court_volume
 
 if __name__ == '__main__':
     CPUs = cpu_count() // 2
@@ -28,11 +31,11 @@ if __name__ == '__main__':
 
     df_mongo = prep_analysis_for_mongo()
     # run_mongo_pipeline(df_mongo)
-    df_mongo.to_csv('data/arrest_volume.csv')
+    df_mongo.to_csv('data/arrest_volume.csv', index=False)
 
     df_backlog = estimate_court_backlog()
     # run_mongo_pipeline(df, collection_name='court_backlog_estimate')
-    df_backlog.to_csv('data/court_backlog.csv')
+    df_backlog.to_csv('data/court_backlog.csv', index=False)
 
 
 
