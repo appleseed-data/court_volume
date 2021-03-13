@@ -122,25 +122,40 @@ def run_prophet_dispo(train, ds_col='ds', predict_col='yhat'):
 
 ## How to Get Started With this Code
 
-1. Clone the repo - any way works, but try this:
+1. Clone the Repository:
 
 ```terminal
 git clone https://github.com/justinhchae/court_volume
 ```
 
-2. Will most likely work best for dependencies - create a new conda environment from the environment.yml file
+2. Set anaconda environment from the environment.yml file
 
 ```terminal
 conda env create -f environment.yml
 ```
 
-1. Should work for dependencies, but I had some issues with requirements.txt
+3. Add additional dependencies from requirements.txt
 
 ```terminal
 pip install -r requirements.txt
 ```
 
-4. See the [conda docs](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)
+4. Some helpful commands to manage your conda environment. 
+```terminal
+# deactivate current: 
+conda deactivate
+
+# delete conda env: 
+conda remove --name court_volume --all
+
+# restore conda env: 
+conda env create -f environment.yml
+
+# activate new env: 
+conda activate court_volume
+```
+
+5. See the [conda docs](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)
 
 
-5. Run main.py which will read the source file, process it, and generate forecasts. You know it worked if the script generates .pickle files and says that the forecasts have finished running.
+6. Run main.py which will read the source file, process it, and generate forecasts. You know it worked if the script generates .pickle files and says that the forecasts have finished running.
