@@ -43,7 +43,7 @@ def run_disposition_pipeline(filename, data_folder):
 
 def run_arrests_pipeline(filename, data_folder):
     # return a prepared dataset of arrests from compressed file
-    # the pipeline is just a shell for now as no modifications are needed at this time
+    # the pipeline is shorter than dispositions because it is pre-processed from another project
     df = get_source_file(filename)
     x = (df.pipe(prep_arrest_data_for_prophet, data_folder=data_folder)
          )
