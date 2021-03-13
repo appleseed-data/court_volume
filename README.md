@@ -162,4 +162,9 @@ git rm --cached <file>
 5. See the [conda docs](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)
 
 
-6. Run main.py which will read the source file, process it, and generate forecasts. You know it worked if the script generates .pickle files and says that the forecasts have finished running. Logging INFO messages will let you know how the progress is going. 
+6. Run main.py which will read the source file, process it, and generate forecasts. You know it worked if the script generates .pickle files and says that the forecasts have finished running. Logging INFO messages will let you know how the progress is going. Depending on your local setup, you may need to adjust your structure and interpretor. 
+
+```terminal
+# try this from command line
+python src/main.py
+```
