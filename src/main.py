@@ -1,8 +1,8 @@
-from utils.pipelines_data import *
-from analyses.covid_cliff import *
-from utils.config import Columns
-import logging
-logging.basicConfig(level=logging.INFO)
+from utils_data.pipelines_data import run_disposition_pipeline, run_arrests_pipeline, run_mongo_pipeline
+from utils_forecasting.pipelines_forecasting import run_prophet_dispositions, run_prophet_arrests
+
+from utils_data.config import Columns, export_disposition_data, merge_dispositions_arrests, filter_court_backlog
+
 import os
 
 from multiprocessing import Pool, cpu_count
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     ## make forecasts
     # predict for disposition data with pooling
     p = Pool(CPUs)
-    disposition_predictions = list(p.imap(run_prophet_dispo, sequenced_disposition_data))
+    disposition_predictions = list(p.imap(run_prophet_dispositions, sequenced_disposition_data))
     p.close()
     p.join()
 
@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     # predict for arrest data without pooling
     # export for arrests is embedded into helper functions
-    arrest_predictions = predict_arrest_data(sequenced_arrest_data, data_folder)
+    arrest_predictions = run_prophet_arrests(sequenced_arrest_data, data_folder)
 
     ## merge data for for analysis
     # combine actual and predicted for each of court and arrest data
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     df_backlog.to_csv(datafile, index=False)
 
     ## upload to online database (only if configured)
-    run_mongo = False
+    run_mongo = True
 
     if run_mongo == True:
         # the mongo pipeline is only available if env and mongo account are established

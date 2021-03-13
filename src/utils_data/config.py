@@ -1,13 +1,15 @@
 import pandas as pd
+pd.set_option('display.max_columns', None)
+import numpy as np
+
 import os
 import re
-import numpy as np
 
 from pymongo import MongoClient
 from decouple import config
 
-pd.set_option('display.max_columns', None)
-
+import logging
+logging.basicConfig(level=logging.INFO)
 
 np_days = np.timedelta64(1, 'D')
 np_hours = np.timedelta64(1, 'h')
@@ -817,3 +819,69 @@ class MakeMongo():
             db[collection].delete_many({})
             db[collection].insert(data_dict)
             print('Inserted DB to Collection')
+
+def export_disposition_data(predictions
+                            , data_folder
+                            , csv_filename='covid_cliff_court_data_predicted.csv'
+                            , pickle_filename='covid_cliff_court_data_predicted.pickle'
+                            ):
+    df = pd.concat([pd.concat(i) for i in predictions])
+    df = df.rename(columns={'ds': c.disposition_date
+                            ,'y': 'case_count'
+                            ,'yhat': 'predicted_case_count'})
+
+    df = df[[c.disposition_date, 'case_count', c.charge_disposition_cat, 'predicted_case_count']]
+
+    grouper = pd.Grouper(key=c.disposition_date, freq='M')
+
+    df = df.groupby([c.charge_disposition_cat, grouper]).agg({'case_count':'sum','predicted_case_count':'sum'})
+
+    df = df.reset_index()
+
+    df = df.sort_values(by=[c.disposition_date])
+    df = df.reset_index(drop=True)
+
+    df = df[[c.disposition_date, 'case_count', c.charge_disposition_cat, 'predicted_case_count']]
+
+    data_file = os.sep.join([data_folder, csv_filename])
+    df.to_csv(data_file, index=False)
+    data_file = os.sep.join([data_folder, pickle_filename])
+    df.to_pickle(data_file)
+
+    return df
+
+def merge_dispositions_arrests(court_df, arrest_df):
+
+    df = pd.merge(court_df, arrest_df, left_on=c.disposition_date, right_on='arrest_date')
+
+    df = df.rename(columns={c.disposition_date:'date'})
+
+    df = df.drop(columns=['arrest_date'])
+
+    df['case_count'] = list(zip(df[c.charge_disposition_cat],df['case_count']))
+    df['predicted_case_count'] = list(zip(df[c.charge_disposition_cat],df['predicted_case_count']))
+
+    df['arrest_count'] = list(zip(df['arrest_type'], df['arrest_count']))
+    df['predicted_arrest_count'] = list(zip(df['arrest_type'], df['predicted_arrest_count']))
+
+    df.drop(columns=['arrest_type', c.charge_disposition_cat], inplace=True)
+
+    # this is a unified dataframe of dispositions and arrest data
+    return df
+
+def filter_court_backlog(court_df, arrest_df=None):
+    print('------ Generated backlog estimates')
+    # TODO: add arrest data as a prediction feature layer
+    # arrest_df = pd.read_pickle('data/covid_cliff_arrest_data_predicted.pickle')
+
+    df = court_df[court_df[c.disposition_date] > pd.to_datetime("2020-02-01")].copy()
+    df['backlog'] = df['predicted_case_count'] - df['case_count']
+
+    df = df.reset_index(drop=True)
+
+    return df
+
+def decimal_str(x: float, decimals: int = 10) -> str:
+    return format(x, f".{decimals}f").lstrip().rstrip('0')
+
+

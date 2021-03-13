@@ -153,6 +153,10 @@ conda env create -f environment.yml
 
 # activate new env: 
 conda activate court_volume
+
+# remove a file from being tracked
+# this is important becuase it does not delete the file from local 
+git rm --cached <file>
 ```
 
 5. See the [conda docs](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)

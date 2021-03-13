@@ -1,4 +1,4 @@
-from utils.config import *
+from utils_data.config import *
 
 def run_disposition_pipeline(filename, data_folder):
     # get source file, hard coded to the latest dispositions file (compressed as bz2)
