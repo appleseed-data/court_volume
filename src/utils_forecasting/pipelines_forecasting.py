@@ -1,5 +1,8 @@
 from utils_forecasting.config import *
 
+def run_postpredict_dispositions():
+    return
+
 def run_prophet_dispositions(train, ds_col='ds', predict_col='yhat'):
     """
     :param train: a 2-tuple of (data, data category), idx 0 comprising a pandas dataframe, idx 1 a string
@@ -47,9 +50,7 @@ def run_prophet_arrests(df
                       , csv_filename='covid_cliff_arrest_data_predicted.csv'
                       , pickle_filename='covid_cliff_arrest_data_predicted.pickle'
                         ):
-
-    print('------ Ran arrest forecast')
-    # df = pd.read_pickle('data/covid_cliff_arrest_data.pickle')
+    logging.info('run_prophet_arrests() Running arrest forecast')
 
     df = df.rename(columns={'date':'ds'
                             ,'count':'y'})

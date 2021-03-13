@@ -1,9 +1,11 @@
 from utils_data.pipelines_data import run_disposition_pipeline, run_arrests_pipeline, run_mongo_pipeline
-from utils_forecasting.pipelines_forecasting import run_prophet_dispositions, run_prophet_arrests
+from utils_forecasting.pipelines_forecasting import run_prophet_dispositions, run_prophet_arrests, run_postpredict_dispositions
 
 from utils_data.config import Columns, export_disposition_data, merge_dispositions_arrests, filter_court_backlog
 
 import os
+import logging
+logging.basicConfig(level=logging.INFO)
 
 from multiprocessing import Pool, cpu_count
 
@@ -60,7 +62,7 @@ if __name__ == '__main__':
     df_backlog.to_csv(datafile, index=False)
 
     ## upload to online database (only if configured)
-    run_mongo = True
+    run_mongo = False
 
     if run_mongo == True:
         # the mongo pipeline is only available if env and mongo account are established

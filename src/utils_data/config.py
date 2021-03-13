@@ -3,24 +3,21 @@ pd.set_option('display.max_columns', None)
 import numpy as np
 
 import os
+import logging
 import re
 
 from pymongo import MongoClient
 from decouple import config
 
-import logging
-logging.basicConfig(level=logging.INFO)
-
 np_days = np.timedelta64(1, 'D')
 np_hours = np.timedelta64(1, 'h')
 
-# a helpful note to remove stuff from git
-# git rm --cached <file>
 
 def get_source_file(filename):
     """
     a convenience wrapper for reading dataframes
     """
+    logging.info(f'get_source_file() Reading data from {filename}')
     if '.csv' in filename:
         df = pd.read_csv(filename, low_memory=False)
         return df
@@ -313,32 +310,31 @@ class Columns():
 c = Columns()
 
 def parse_cols(df):
-    print('------ Parsing columns text with lower string and underscores')
+    logging.info('parse_cols() Parsing columns text with lower string and underscores')
     df.columns = map(str.lower, df.columns)
     df.columns = df.columns.str.replace(' ', '_')
     df.columns = df.columns.str.replace('-', '_')
     return df
 
 def get_date_cols(df):
+    logging.info('get_date_cols() Getting a list of datetime columns')
     date_pattern = r'_date'
     date_cols = [c for c in df.columns if re.search(date_pattern, c)]
     return date_cols
 
 def parse_dates(df, date_cols=None):
     # filter erroneous dates where arrest date < received in lock up < released from lockup
-    print('------ Parsing dates columns')
+    logging.info('parse_dates() Parsing datetime columns as datetime')
 
     if date_cols is None:
         date_cols = get_date_cols(df)
 
     df[date_cols] = df[date_cols].apply(lambda x: pd.to_datetime(x, errors='coerce', infer_datetime_format=False))
 
-    print(df[date_cols].dtypes)
-
     return df
 
 def remove_conversion_records(df, col_name):
-
+    logging.info('remove_conversion_records() Removing records marked as PROMIS Conversion')
     start = len(df)
 
     df[col_name] = df[col_name].str.title()
@@ -352,9 +348,6 @@ def remove_conversion_records(df, col_name):
     end = len(df)
     count = str(start-end)
 
-    print('------ Filtered PROMIS Conversions: ', len(df))
-    print('--------- Removed', count, 'records')
-
     return df
 
 def impute_dates(df, col1=None, col2=None, date_type=None):
@@ -362,9 +355,8 @@ def impute_dates(df, col1=None, col2=None, date_type=None):
     assumptions:
     1. if event date greater than this year + 1, it is a mistake and the year should be the same year as received
     2. if event date less than 2011, it is a mistake and should be same as received year
-    3.
     """
-
+    logging.info('impute_dates() Filling in missing dates based on ruleset')
     today = pd.Timestamp.now()
     curr_year = today.year
     past_year = 2010
@@ -401,8 +393,6 @@ def impute_dates(df, col1=None, col2=None, date_type=None):
             impute = lambda x: new(x) if x[col1] > today else x[col1]
             df[col_new] = df.apply(impute, axis=1)
 
-            print('------ Impute Dates:', col1, ' ', len(df))
-
             df[col1] = df[col_new]
 
             df = df.drop(columns=[col_new, 'diff'])
@@ -428,7 +418,7 @@ def typeas_string(df, cols):
 
 def classer(df, col_name, echo=False):
     if echo:
-        print('------ Classifying to Categorical:', col_name)
+        logging.info(f'classer() Classifying to Categorical: {col_name}')
 
     def reverse(lst):
         lst.reverse()
@@ -451,7 +441,7 @@ def classer(df, col_name, echo=False):
 
         diff = start-end
         if echo:
-            print('------ Dropped Records with U:', str(diff))
+            logging.info(f'classer() Dropped Records with U: {diff}')
 
         df[col_name] = df[col_name].astype('category')
         df[col_name] = df[col_name].cat.as_ordered()
@@ -518,13 +508,13 @@ def classer(df, col_name, echo=False):
 
 
 def make_caselen(df, col1=None, col2=None):
+    logging.info('make_caselen() Calculating case length')
     df['case_length'] = (df[col2] - df[col1]) / np_days
     return df
 
 
 def reduce_bool_precision(df, col=None):
-
-    print('------ Parsing least precision for boolean')
+    logging.info('reduce_bool_precision() Parsing least precision for boolean')
     cols = list(df.columns)
 
     bool_types = ['flag', 'finding_no_probable_cause']
@@ -538,11 +528,10 @@ def reduce_bool_precision(df, col=None):
     return df
 
 def map_disposition_categories(df, col1=None):
-
+    logging.info(f'map_disposition_categories() Mapping Categories for {col1}')
     cat_col = str(col1 + '_cat')
     df[cat_col] = df[col1].map(c.key_dispo)
     df[cat_col] = df[cat_col].astype('category')
-    print('------ Mapped Categories for', col1)
 
     return df
 
@@ -551,8 +540,7 @@ def reduce_precision(df, run_spellcheck=False):
     :param df: attempts to auto-optimize a dataframe by applying least precision to each col type
     :return: the same dataframe but with different col dtypes, if applicable
     """
-
-    print('------ Optimize DataFrame Memory')
+    logging.info('reduce_precision() Optimizing DataFrame Memory')
 
     cols_to_convert = []
     date_strings = ['_date', 'date_', 'date']
@@ -675,8 +663,7 @@ def ov1_disposition(df):
     df['year'] = df['year'].astype('int16')
 
     df = df.reset_index(drop=True)
-
-    print('------ Returning Disposition Data for Most Severe Charge in a Given Case.')
+    logging.info('ov1_disposition() Returning Disposition Data for Most Severe Charge in a Given Case')
 
     return df
 
@@ -802,6 +789,8 @@ class MakeMongo():
         """
 
     def insert_df(self, database=None, collection=None, df=None):
+        logging.info('MakeMongo.insert_df() Uploading data to MongoDB')
+
         header = "mongodb+srv://"
 
         connection_string = str(header+self.un+":"+self.pw+"@"+self.host+"/"+"?retryWrites=true&w=majority")
@@ -818,7 +807,7 @@ class MakeMongo():
             data_dict = df.to_dict("records")
             db[collection].delete_many({})
             db[collection].insert(data_dict)
-            print('Inserted DB to Collection')
+            logging.info('MakeMongo.insert_df() Completed MongoDB Upload')
 
 def export_disposition_data(predictions
                             , data_folder
@@ -870,7 +859,7 @@ def merge_dispositions_arrests(court_df, arrest_df):
     return df
 
 def filter_court_backlog(court_df, arrest_df=None):
-    print('------ Generated backlog estimates')
+    logging.info('filter_court_backlog() Generated backlog estimates')
     # TODO: add arrest data as a prediction feature layer
     # arrest_df = pd.read_pickle('data/covid_cliff_arrest_data_predicted.pickle')
 

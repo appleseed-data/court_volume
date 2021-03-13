@@ -3,12 +3,9 @@ pd.set_option('display.max_columns', None)
 import numpy as np
 
 import os
+import logging
 
 from fbprophet import Prophet
-
-import logging
-logging.basicConfig(level=logging.INFO)
-
 
 class suppress_stdout_stderr(object):
     '''

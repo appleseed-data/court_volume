@@ -1,6 +1,7 @@
 from utils_data.config import *
 
 def run_disposition_pipeline(filename, data_folder):
+    logging.info('run_disposition_pipeline() Starting data pipeline for dispositions')
     # get source file, hard coded to the latest dispositions file (compressed as bz2)
     df = get_source_file(filename)
 
@@ -39,17 +40,21 @@ def run_disposition_pipeline(filename, data_folder):
            .pipe(prep_disposition_data_for_prophet)
         )
     # return x-> a sequenced data struct of dfs for prophet prediction
+    logging.info('run_disposition_pipeline() Completed data pipeline for dispositions')
     return x
 
 def run_arrests_pipeline(filename, data_folder):
+    logging.info('run_arrests_pipeline() Starting data pipeline for arrests')
     # return a prepared dataset of arrests from compressed file
     # the pipeline is shorter than dispositions because it is pre-processed from another project
     df = get_source_file(filename)
     x = (df.pipe(prep_arrest_data_for_prophet, data_folder=data_folder)
          )
+    logging.info('run_arrests_pipeline() Completed data pipeline for arrests')
     # return x-> a sequenced data struct of df for prophet prediction
     return x
 
 def run_mongo_pipeline(df, collection_name):
+    logging.info('run_mongo_pipeline() Starting data pipeline for MongoDB upload')
     # insert/update database
     MakeMongo().insert_df(collection=collection_name, df=df)
