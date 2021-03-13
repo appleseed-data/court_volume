@@ -773,9 +773,11 @@ def prep_arrest_data_for_prophet(df
 
     data_file = os.sep.join([data_folder, csv_filename])
     df.to_csv(data_file, index=False)
+    logging.info(f'prep_arrest_data_for_prophet() Wrote to disk {data_file}')
+
     data_file = os.sep.join([data_folder, pickle_filename])
     df.to_pickle(data_file)
-
+    logging.info(f'prep_arrest_data_for_prophet() Wrote to disk {data_file}')
     return df
 
 class MakeMongo():
@@ -809,8 +811,9 @@ class MakeMongo():
             db[collection].insert(data_dict)
             logging.info('MakeMongo.insert_df() Completed MongoDB Upload')
 
-def export_disposition_data(predictions
+def etl_disposition_data(predictions
                             , data_folder
+                            , raw_predictions='raw_court_data_predictions.csv'
                             , csv_filename='covid_cliff_court_data_predicted.csv'
                             , pickle_filename='covid_cliff_court_data_predicted.pickle'
                             ):
@@ -820,6 +823,11 @@ def export_disposition_data(predictions
                             ,'yhat': 'predicted_case_count'})
 
     df = df[[c.disposition_date, 'case_count', c.charge_disposition_cat, 'predicted_case_count']]
+    data_file = os.sep.join([data_folder, raw_predictions])
+    # export data to file for analysis
+    raw_dispositions_predictions = df.copy(deep=True)
+    raw_dispositions_predictions.to_csv(data_file, index=False)
+    logging.info(f'etl_disposition_data() Wrote to disk {data_file}')
 
     grouper = pd.Grouper(key=c.disposition_date, freq='M')
 
@@ -834,10 +842,12 @@ def export_disposition_data(predictions
 
     data_file = os.sep.join([data_folder, csv_filename])
     df.to_csv(data_file, index=False)
+    logging.info(f'etl_disposition_data() Wrote to disk {data_file}')
     data_file = os.sep.join([data_folder, pickle_filename])
     df.to_pickle(data_file)
+    logging.info(f'etl_disposition_data() Wrote to disk {data_file}')
 
-    return df
+    return df, raw_dispositions_predictions
 
 def merge_dispositions_arrests(court_df, arrest_df):
 

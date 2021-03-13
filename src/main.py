@@ -1,7 +1,7 @@
 from utils_data.pipelines_data import run_disposition_pipeline, run_arrests_pipeline, run_mongo_pipeline
 from utils_forecasting.pipelines_forecasting import run_prophet_dispositions, run_prophet_arrests, run_postpredict_dispositions
-
-from utils_data.config import Columns, export_disposition_data, merge_dispositions_arrests, filter_court_backlog
+from utils_analysis.pipelines_analysis import eval_prophet
+from utils_data.config import Columns, etl_disposition_data, merge_dispositions_arrests, filter_court_backlog
 
 import os
 import logging
@@ -39,7 +39,10 @@ if __name__ == '__main__':
     p.join()
 
     # organize predictions into a single df and export to disk
-    disposition_data = export_disposition_data(disposition_predictions, data_folder)
+    disposition_data, raw_dispositions_predictions = etl_disposition_data(disposition_predictions, data_folder)
+
+    # evaluate prediction results
+    eval_prophet(raw_dispositions_predictions, data_type='disposition', data_folder=data_folder)
 
     # predict for arrest data without pooling
     # export for arrests is embedded into helper functions
@@ -50,16 +53,18 @@ if __name__ == '__main__':
     df_merged = merge_dispositions_arrests(disposition_data, arrest_predictions)
     # set full path to target data
     filename = 'arrest_volume.csv'
-    datafile = os.sep.join([data_folder, filename])
+    data_file = os.sep.join([data_folder, filename])
     # export results to csv for quick reference
-    df_merged.to_csv(datafile, index=False)
+    df_merged.to_csv(data_file, index=False)
+    logging.info(f'main() Wrote to disk {data_file}')
 
     # filter merged data to focus on estimated backlog time period
     df_backlog = filter_court_backlog(court_df=disposition_data)
     # export results to csv for quick reference
     filename = 'court_backlog.csv'
-    datafile = os.sep.join([data_folder, filename])
-    df_backlog.to_csv(datafile, index=False)
+    data_file = os.sep.join([data_folder, filename])
+    df_backlog.to_csv(data_file, index=False)
+    logging.info(f'main() Wrote to disk {data_file}')
 
     ## upload to online database (only if configured)
     run_mongo = False
@@ -68,10 +73,3 @@ if __name__ == '__main__':
         # the mongo pipeline is only available if env and mongo account are established
         run_mongo_pipeline(df_merged, collection_name='court_arrest_volumes')
         run_mongo_pipeline(df_backlog, collection_name='court_backlog_estimate')
-
-
-
-
-
-
-
