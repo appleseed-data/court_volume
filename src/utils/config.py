@@ -8,7 +8,7 @@ from decouple import config
 
 pd.set_option('display.max_columns', None)
 
-data_folder = 'data/'
+
 np_days = np.timedelta64(1, 'D')
 np_hours = np.timedelta64(1, 'h')
 
@@ -19,12 +19,11 @@ def get_source_file(filename):
     """
     a convenience wrapper for reading dataframes
     """
-    filepath = data_folder + filename
     if '.csv' in filename:
-        df = pd.read_csv(filepath, low_memory=False)
+        df = pd.read_csv(filename, low_memory=False)
         return df
     elif '.pickle' in filename or '.bz2' in filename:
-        df = pd.read_pickle(filepath)
+        df = pd.read_pickle(filename)
         return df
 
 class Columns():
@@ -676,6 +675,117 @@ def ov1_disposition(df):
     df = df.reset_index(drop=True)
 
     print('------ Returning Disposition Data for Most Severe Charge in a Given Case.')
+
+    return df
+
+def filter_disposition_data(df
+                        , data_folder
+                        , csv_filename='covid_cliff_disposition_data.csv'
+                        , pickle_filename='covid_cliff_disposition_data.pickle'
+                          ):
+
+    restricted_list = ['Death', 'Mental Health', 'Other']
+
+    df = ov1_disposition(df)
+    df = df[~(df[c.charge_disposition_cat].isin(restricted_list))].copy()
+    df[c.charge_disposition_cat] = df[c.charge_disposition_cat].cat.remove_unused_categories()
+    df = df[[c.disposition_date, c.charge_disposition_cat, c.case_length]]
+
+    data_file = os.sep.join([data_folder, csv_filename])
+    df.to_csv(data_file)
+    data_file = os.sep.join([data_folder, pickle_filename])
+    df.to_pickle(data_file)
+
+    return df
+
+def make_sequence_for_prophet(x):
+    """
+    A helper function for
+    :param x: a dataframe having data for train and test (everything)
+    :return: a list of 2-tuples having (dataframe, string) as data and data label for prophet
+    """
+
+    # map for col names per facebook api
+    key_map = {c.disposition_date: 'ds', 'count': 'y'}
+
+    # apply col name remap
+    df = x.rename(columns=key_map)
+
+    # group data by desired category
+    df = df.groupby(c.charge_disposition_cat)
+
+    # init empty list for output
+    data_list = []
+
+    for name, group in df:
+        # loop through each data from of group
+        # hard-coded values for window and step size
+        year_idx_start = 2011
+        window_size = 2
+        step_size = 1
+        year_idx_max = 2021
+        steps = list(range(year_idx_start, year_idx_max+1))
+
+        x_i = []
+        y_i = []
+
+        df = group.copy()
+
+        # within each loop, extract data frame into train and test pairs
+        for step in steps:
+            # train on two years, predict the third, break when year 3 is at end of index
+            if step + 3 > max(steps):
+                break
+
+            # in the first loop, 2011 < x.dt.year < 2013 and y.dt.year == 2014
+            X = df[(df['ds'].dt.year >= step) & (df['ds'].dt.year <= step + window_size)].reset_index(drop=True)
+            Y = df[(df['ds'].dt.year == step + window_size + step_size)].reset_index(drop=True)
+
+            # save sequenced dataframes in lists
+            x_i.append(X)
+            y_i.append(Y)
+
+        # save data as 2-tuple pairs
+        data = (x_i, y_i)
+
+        # accumulate data as a list of tuples
+        data_list.append((data, name))
+
+    return data_list
+
+def prep_disposition_data_for_prophet(df):
+
+    grouper = pd.Grouper(key=c.disposition_date, freq='D')
+
+    df = df.groupby([c.charge_disposition_cat, grouper])[c.charge_disposition_cat].agg('count')
+    df = df.reset_index(name='count')
+    df = df.sort_values(by=[c.disposition_date])
+    df = df.reset_index(drop=True)
+
+    data = make_sequence_for_prophet(df)
+
+    return data
+
+def prep_arrest_data_for_prophet(df
+                               , data_folder
+                               , csv_filename='covid_cliff_arrest_data.csv'
+                               , pickle_filename='covid_cliff_arrest_data.pickle'
+                                 ):
+    felony_flag = "F"
+    frequency = "M"
+
+    df = df[df['charge_1_type'] == felony_flag].copy()
+
+    df['date'] = pd.to_datetime(df['arrest_year'].astype(str) + '-' + df['arrest_month'].astype(str) + '-01')
+    df = df[['date', 'charge_1_class']].groupby([pd.Grouper(key='date', freq=frequency)]).agg('count').reset_index()
+    df = df.sort_values('date')
+    df['type'] = 'Felony Arrest'
+    df.rename(columns={'charge_1_class': 'count'}, inplace=True)
+
+    data_file = os.sep.join([data_folder, csv_filename])
+    df.to_csv(data_file, index=False)
+    data_file = os.sep.join([data_folder, pickle_filename])
+    df.to_pickle(data_file)
 
     return df
 

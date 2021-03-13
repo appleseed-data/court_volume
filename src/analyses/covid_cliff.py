@@ -41,7 +41,6 @@ class suppress_stdout_stderr(object):
         for fd in self.null_fds + self.save_fds:
             os.close(fd)
 
-
 def run_prophet_dispo(train, ds_col='ds', predict_col='yhat'):
     """
     :param train: a 2-tuple of (data, data category), idx 0 comprising a pandas dataframe, idx 1 a string
@@ -155,22 +154,7 @@ def eval_prophet(ytrue, yhat):
 
     return df, error
 
-
-def prep_disposition_data(x):
-    restricted_list = ['Death', 'Mental Health', 'Other']
-
-    df = ov1_disposition(x)
-    df = df[~(df[c.charge_disposition_cat].isin(restricted_list))].copy()
-    df[c.charge_disposition_cat] = df[c.charge_disposition_cat].cat.remove_unused_categories()
-    df = df[[c.disposition_date, c.charge_disposition_cat, c.case_length]]
-
-    df.to_pickle('data/covid_cliff_disposition_data.pickle')
-    df.to_csv('data/covid_cliff_disposition_data.csv')
-
-
-def predict_disposition_data():
-    print('------ Ran court forecast')
-    df = pd.read_pickle('data/covid_cliff_disposition_data.pickle')
+def predict_disposition_data(df):
 
     grouper = pd.Grouper(key=c.disposition_date, freq='D')
 
@@ -183,8 +167,11 @@ def predict_disposition_data():
 
     return data
 
-
-def export_disposition_data(predictions):
+def export_disposition_data(predictions
+                            , data_folder
+                            , csv_filename='covid_cliff_court_data_predicted.csv'
+                            , pickle_filename='covid_cliff_court_data_predicted.pickle'
+                            ):
     df = pd.concat([pd.concat(i) for i in predictions])
     df = df.rename(columns={'ds': c.disposition_date
                             ,'y': 'case_count'
@@ -203,25 +190,12 @@ def export_disposition_data(predictions):
 
     df = df[[c.disposition_date, 'case_count', c.charge_disposition_cat, 'predicted_case_count']]
 
-    df.to_csv('data/covid_cliff_court_data_predicted.csv', index=False)
-    df.to_pickle('data/covid_cliff_court_data_predicted.pickle')
+    data_file = os.sep.join([data_folder, csv_filename])
+    df.to_csv(data_file, index=False)
+    data_file = os.sep.join([data_folder, pickle_filename])
+    df.to_pickle(data_file)
 
-
-def prep_arrest_data(df):
-    felony_flag = "F"
-    frequency = "M"
-
-    df = df[df['charge_1_type'] == felony_flag].copy()
-
-    df['date'] = pd.to_datetime(df['arrest_year'].astype(str) + '-' + df['arrest_month'].astype(str) + '-01')
-    df = df[['date', 'charge_1_class']].groupby([pd.Grouper(key='date', freq=frequency)]).agg('count').reset_index()
-    df = df.sort_values('date')
-    df['type'] = 'Felony Arrest'
-    df.rename(columns={'charge_1_class': 'count'}, inplace=True)
-
-    df.to_csv('data/covid_cliff_arrest_data.csv', index=False)
-    df.to_pickle('data/covid_cliff_arrest_data.pickle')
-
+    return df
 
 def run_prophet_arrest(x, y, ds_col='ds', predict_col='yhat'):
 
@@ -240,10 +214,14 @@ def run_prophet_arrest(x, y, ds_col='ds', predict_col='yhat'):
 
     return df
 
+def predict_arrest_data(df
+                      , data_folder
+                      , csv_filename='covid_cliff_arrest_data_predicted.csv'
+                      , pickle_filename='covid_cliff_arrest_data_predicted.pickle'
+                        ):
 
-def predict_arrest_data():
     print('------ Ran arrest forecast')
-    df = pd.read_pickle('data/covid_cliff_arrest_data.pickle')
+    # df = pd.read_pickle('data/covid_cliff_arrest_data.pickle')
 
     df = df.rename(columns={'date':'ds'
                             ,'count':'y'})
@@ -258,16 +236,15 @@ def predict_arrest_data():
                                 ,'yhat':'predicted_arrest_count'
                                 ,'type':'arrest_type' })
 
-    df.to_csv('data/covid_cliff_arrest_data_predicted.csv')
-    df.to_pickle('data/covid_cliff_arrest_data_predicted.pickle')
+    data_file = os.sep.join([data_folder, csv_filename])
+    df.to_csv(data_file, index=False)
+    data_file = os.sep.join([data_folder, pickle_filename])
+    df.to_pickle(data_file)
 
     return df
 
+def merge_dispositions_arrests(court_df, arrest_df):
 
-def prep_analysis_for_mongo():
-    court_df = pd.read_pickle('data/covid_cliff_court_data_predicted.pickle')
-    arrest_df = pd.read_pickle('data/covid_cliff_arrest_data_predicted.pickle')
-    
     df = pd.merge(court_df, arrest_df, left_on=c.disposition_date, right_on='arrest_date')
 
     df = df.rename(columns={c.disposition_date:'date'})
@@ -282,13 +259,13 @@ def prep_analysis_for_mongo():
 
     df.drop(columns=['arrest_type', c.charge_disposition_cat], inplace=True)
 
+    # this is a unified dataframe of dispositions and arrest data
     return df
 
-
-def estimate_court_backlog():
+def filter_court_backlog(court_df, arrest_df=None):
     print('------ Generated backlog estimates')
-    court_df = pd.read_pickle('data/covid_cliff_court_data_predicted.pickle')
-    arrest_df = pd.read_pickle('data/covid_cliff_arrest_data_predicted.pickle')
+    # TODO: add arrest data as a prediction feature layer
+    # arrest_df = pd.read_pickle('data/covid_cliff_arrest_data_predicted.pickle')
 
     df = court_df[court_df[c.disposition_date] > pd.to_datetime("2020-02-01")].copy()
     df['backlog'] = df['predicted_case_count'] - df['case_count']
