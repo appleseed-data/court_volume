@@ -6,11 +6,8 @@ logging.basicConfig(level=logging.INFO)
 import os
 
 from multiprocessing import Pool, cpu_count
-# deactivate current: conda deactivate
-# delete conda env: conda remove --name court_volume --all
-# restore conda env: conda env create -f environment.yml
-# activate new env: conda activate court_volume
-# testing code rebase
+
+
 if __name__ == '__main__':
     # configure optimal number of processes to run
     CPUs = cpu_count() // 2
