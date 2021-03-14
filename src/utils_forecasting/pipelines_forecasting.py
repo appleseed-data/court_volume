@@ -1,4 +1,4 @@
-from utils_forecasting.config import *
+from src.utils_forecasting.config import *
 
 def run_postpredict_dispositions():
     return

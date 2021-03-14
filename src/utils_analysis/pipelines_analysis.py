@@ -1,4 +1,4 @@
-from utils_analysis.config import *
+from src.utils_analysis.config import *
 
 def eval_prophet(df, data_type, data_folder, csv_filename='model_accuracy.csv', tgt_category='charge_disposition_cat', ytrue='case_count', yhat='predicted_case_count'):
     """

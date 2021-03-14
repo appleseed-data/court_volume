@@ -1,4 +1,4 @@
-from utils_data.config import *
+from src.utils_data.config import *
 
 def run_disposition_pipeline(filename, data_folder):
     logging.info('run_disposition_pipeline() Starting data pipeline for dispositions')

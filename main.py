@@ -1,7 +1,7 @@
-from utils_data.pipelines_data import run_disposition_pipeline, run_arrests_pipeline, run_mongo_pipeline
-from utils_forecasting.pipelines_forecasting import run_prophet_dispositions, run_prophet_arrests, run_postpredict_dispositions
-from utils_analysis.pipelines_analysis import eval_prophet
-from utils_data.config import Columns, etl_disposition_data, merge_dispositions_arrests, filter_court_backlog
+from src.utils_data.pipelines_data import run_disposition_pipeline, run_arrests_pipeline, run_mongo_pipeline
+from src.utils_forecasting.pipelines_forecasting import run_prophet_dispositions, run_prophet_arrests, run_postpredict_dispositions
+from src.utils_analysis.pipelines_analysis import eval_prophet
+from src.utils_data.config import Columns, etl_disposition_data, merge_dispositions_arrests, filter_court_backlog
 
 import os
 import logging
@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     ## get source data and prepare for forecasting
     # set path to data folder
-    data_folder = os.sep.join([os.environ['PWD'], 'src', 'data'])
+    data_folder = os.sep.join([os.environ['PWD'], 'data'])
     # set full path to target data
     filename = 'dispositions.bz2'
     datafile = os.sep.join([data_folder, filename])
