@@ -15,6 +15,22 @@ np_hours = np.timedelta64(1, 'h')
 import multiprocessing as mp
 from tqdm import tqdm
 
+from io import BytesIO
+import requests
+import joblib
+
+
+arrest_data_path = "https://github.com/appleseed-data/arrest_clusters/blob/main/data/arrests_redacted_classified.bz2?raw=true"
+
+def get_git_pickle(data_path):
+    logging.info(f'Reading file from remote location at {data_path}')
+    data_stream = BytesIO(requests.get(data_path).content)
+    tgt_file = joblib.load(data_stream)
+
+    logging.info(f'Read in target as a {type(tgt_file)} with len({len(tgt_file)})')
+
+    return tgt_file
+
 def to_dt(x):
     # a helper function for conversion to pandas date time
     # coerce errors here but currect them later

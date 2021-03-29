@@ -43,13 +43,19 @@ def run_disposition_pipeline(filename, data_folder):
     logging.info('run_disposition_pipeline() Completed data pipeline for dispositions')
     return x
 
-def run_arrests_pipeline(filename, data_folder):
+def run_arrests_pipeline(data_folder, filename=None, df=None):
     logging.info('run_arrests_pipeline() Starting data pipeline for arrests')
     # return a prepared dataset of arrests from compressed file
     # the pipeline is shorter than dispositions because it is pre-processed from another project
-    df = get_source_file(filename)
-    x = (df.pipe(prep_arrest_data_for_prophet, data_folder=data_folder)
-         )
+    if df is not None:
+        df = df
+        filename = None
+
+    if filename is not None:
+        df = get_source_file(filename)
+
+    x = (df.pipe(prep_arrest_data_for_prophet, data_folder=data_folder))
+
     logging.info('run_arrests_pipeline() Completed data pipeline for arrests')
     # return x-> a sequenced data struct of df for prophet prediction
     return x
