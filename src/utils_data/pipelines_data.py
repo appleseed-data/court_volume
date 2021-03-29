@@ -22,7 +22,7 @@ def run_disposition_pipeline(filename, data_folder):
 
     # run data through cleaning and prep pipeline
     x = (df.pipe(parse_cols)
-           .pipe(parse_dates)
+           .pipe(parse_date_cols)
            .pipe(remove_conversion_records, col_name=c.offense_category)
            .pipe(remove_conversion_records, col_name=c.disposition_court_name)
            .pipe(remove_conversion_records, col_name=c.disposition_court_facility)

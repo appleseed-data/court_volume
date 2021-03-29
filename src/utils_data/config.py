@@ -12,6 +12,39 @@ from decouple import config
 np_days = np.timedelta64(1, 'D')
 np_hours = np.timedelta64(1, 'h')
 
+import multiprocessing as mp
+from tqdm import tqdm
+
+def to_dt(x):
+    # a helper function for conversion to pandas date time
+    # coerce errors here but currect them later
+    x = pd.to_datetime(x, errors='coerce', infer_datetime_format=False)
+    return x
+
+def parse_date_cols(df, date_strings=('_date', 'date_')):
+    logging.info('Date columns conversion to dtype datetime.')
+    cols_to_convert = []
+    col_names = []
+
+    for col in df.columns:
+        col_type = df[col].dtype
+        if 'datetime' in col_type.name or any(i in col for i in date_strings):
+            cols_to_convert.append(df[col])
+            col_names.append(col)
+
+    pbar = tqdm(cols_to_convert, desc='Running Datetime Conversion')
+
+    CPUs = mp.cpu_count() // 2
+    pool = mp.Pool(CPUs)
+    results = list(pool.imap(to_dt, pbar))
+    pool.close()
+    pool.join()
+
+    for result in results:
+        df[result.name] = result.dt.tz_localize(tz=None)
+
+    return df
+
 
 def get_source_file(filename):
     """

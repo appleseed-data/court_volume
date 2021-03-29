@@ -2,15 +2,36 @@ from src.utils_data.pipelines_data import run_disposition_pipeline, run_arrests_
 from src.utils_forecasting.pipelines_forecasting import run_prophet_dispositions, run_prophet_arrests, run_postpredict_dispositions
 from src.utils_analysis.pipelines_analysis import eval_prophet
 from src.utils_data.config import Columns, etl_disposition_data, merge_dispositions_arrests, filter_court_backlog
+from io import BytesIO, StringIO
+import pickle
+import requests
+import joblib
 
+import time
 import os
+
+time_string = time.strftime("%Y%m%d-%H%M%S")
+
 import logging
-logging.basicConfig(level=logging.INFO)
-
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s',datefmt='%m/%d/%Y %I:%M:%S %p')
 from multiprocessing import Pool, cpu_count
-
+import pandas as pd
+import pickle
+import bz2
 
 if __name__ == '__main__':
+
+    # configure logging
+    # logs_folder = os.sep.join([os.environ['PWD'], 'logs'])
+    # if not os.path.exists(logs_folder):
+    #     os.makedirs(logs_folder)
+    #
+    # logs_filename = f'{time_string}_log.log'
+    # logs_file = os.sep.join([logs_folder, logs_filename])
+    # logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s',datefmt='%m/%d/%Y %I:%M:%S %p')
+    # logging.basicConfig(filename=logs_file, level=logging.INFO, format='%(asctime)s %(message)s',
+    #                     datefmt='%m/%d/%Y %I:%M:%S %p')
+
     # configure optimal number of processes to run
     CPUs = cpu_count() // 2
     # configure global variable to reference common strings and structures
@@ -25,8 +46,8 @@ if __name__ == '__main__':
     # run disposition data processing pipeline and return a dataframe
     sequenced_disposition_data = run_disposition_pipeline(datafile, data_folder)
 
-    # set full path to target data
-    filename = 'arrests_analysis_public.bz2'
+    # filename = 'arrests_analysis_public.bz2'
+    filename = 'arrests_redacted_classified.bz2'
     datafile = os.sep.join([data_folder, filename])
     # run arrests data processing pipeline and return a dataframe
     sequenced_arrest_data = run_arrests_pipeline(datafile, data_folder)
