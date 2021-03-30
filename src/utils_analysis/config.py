@@ -36,8 +36,10 @@ def make_surplus_figs(df, analysis_type, figs_folder, filename='fig_2_surplus.pn
     logging.info(f'Running analysis for {analysis_type}.')
     plt.figure(figsize=(10,6))
     sns.barplot(data=df, x='category', hue='organization', y='surplus_count')
-    plt.title(f'{analysis_type} Analysis from {starting_date} to {ending_date}')
+    plt.title(f'Court Case Surplus Analysis from Q4 2019 to Q3 2020')
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.xlabel('Charge Category')
+    plt.ylabel('Surplus Count')
     plt.tight_layout()
     data_path = os.sep.join([figs_folder, filename])
     plt.savefig(data_path)
@@ -89,7 +91,7 @@ def make_stats_figs(df, clearance_rates, analysis_type, figs_folder, filename='f
     g.map(ant, 'quarter', 'organization')
     g.set_xticklabels(rotation=30)
     g.set_ylabels('Count')
-    g.fig.suptitle('Overall Court Statistics between Cook County and Downstate from Q4 2019 to Q4 2020')
+    g.fig.suptitle('Overall Court Statistics between Cook County and Downstate from Q4 2019 to Q3 2020')
 
     custom_lines = [Line2D([0], [0], color="blue", lw=4),
                     Line2D([0], [0], color="orange", lw=4),
