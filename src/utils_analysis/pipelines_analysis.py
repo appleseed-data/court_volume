@@ -34,3 +34,12 @@ def eval_prophet(df, data_type, data_folder, csv_filename='model_accuracy.csv', 
     data_file = os.sep.join([data_folder, csv_filename])
     results.to_csv(data_file, index=False)
     logging.info(f'eval_prophet() Wrote to disk {data_file}')
+
+def eval_court_stats(df, clearance_rates, figs_folder, analysis_type='overall_court_data'):
+    make_stats_figs(df=df, clearance_rates=clearance_rates, analysis_type=analysis_type, figs_folder=figs_folder)
+
+def eval_clearance_rates(df, analysis_type='clearance_rates'):
+    make_clearance_figs(df=df, analysis_type=analysis_type)
+
+def eval_pending_surplus(df, figs_folder, analysis_type='pending_surplus'):
+    make_surplus_figs(df=df, analysis_type=analysis_type, figs_folder=figs_folder)

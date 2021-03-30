@@ -22,6 +22,67 @@ import joblib
 
 arrest_data_path = "https://github.com/appleseed-data/arrest_clusters/blob/main/data/arrests_redacted_classified.bz2?raw=true"
 
+def make_pending_surplus(df):
+    temp = df[df['category'] == 'Pending'].reset_index(drop=True)
+
+    temp = temp.groupby(['organization'])
+
+    cols = ['felony_count', 'misdemeanor_count', 'dui_count', 'total']
+
+    start_date = '2019-4'
+    end_date = '2020-3'
+
+    results = []
+    for k, v in temp:
+
+        starting_vals = v[v['year-quarter'] == start_date]
+        ending_vals = v[v['year-quarter'] == end_date]
+
+
+        for col in cols:
+            starting_val = starting_vals[col].values[0]
+            ending_val = ending_vals[col].values[0]
+            surplus_value = ending_val - starting_val
+
+            result = [k, col, surplus_value, start_date, end_date]
+            results.append(result)
+
+    results = pd.DataFrame(results, columns=['organization', 'category', 'surplus_count', 'starting_quarter', 'ending_quarter'])
+
+    return results
+
+
+def make_clearance_rates(df):
+    temp = df.groupby(['organization', 'year-quarter'])
+
+    clearance_rates = []
+
+    for k, v in temp:
+        row = list(k)
+        x = v[['category', 'total']].set_index('category')
+        demominator = x.loc['New/Reinstated'].values[0]
+        nominator = x.loc['Disposed'].values[0]
+        clearance_rate = (nominator / demominator) * 100
+        clearance_rate = round(clearance_rate, 2)
+        row.append(clearance_rate)
+        row.append('T')
+        clearance_rates.append(row)
+
+    for k, v in temp:
+        row = list(k)
+        x = v[['category', 'felony_count']].set_index('category')
+        demominator = x.loc['New/Reinstated'].values[0]
+        nominator = x.loc['Disposed'].values[0]
+        clearance_rate = (nominator / demominator) * 100
+        clearance_rate = round(clearance_rate, 2)
+        row.append(clearance_rate)
+        row.append('F')
+        clearance_rates.append(row)
+
+    clearance_rates = pd.DataFrame(clearance_rates, columns=['organization', 'year-quarter', 'clearance_rate', 'charge_class'])
+
+    return clearance_rates
+
 def get_git_pickle(data_path):
     logging.info(f'Reading file from remote location at {data_path}')
     data_stream = BytesIO(requests.get(data_path).content)

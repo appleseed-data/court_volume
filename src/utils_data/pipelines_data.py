@@ -60,6 +60,24 @@ def run_arrests_pipeline(data_folder, filename=None, df=None):
     # return x-> a sequenced data struct of df for prophet prediction
     return x
 
+
+def run_court_stats_pipeline(data_folder, filename):
+    data_path = os.sep.join([data_folder, filename])
+    df = pd.read_csv(data_path)
+
+    cols = ['organization', 'category']
+    df[cols] = df[cols].astype('category')
+    cols = ['quarter', 'year', 'felony_count', 'misdemeanor_count', 'dui_count', 'total']
+    df[cols] = df[cols].astype(int)
+    df['year-quarter'] = df["year"].astype(str) + '-' + df["quarter"].astype(str)
+
+    clearance_rates = make_clearance_rates(df)
+
+    pending_surplus = make_pending_surplus(df)
+
+    return df, clearance_rates, pending_surplus
+
+
 def run_mongo_pipeline(df, collection_name):
     logging.info('run_mongo_pipeline() Starting data pipeline for MongoDB upload')
     # insert/update database
