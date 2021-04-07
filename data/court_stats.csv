@@ -1,0 +1,25 @@
+﻿organization,quarter,year,category,felony_count,misdemeanor_count,dui_count,total
+Cook County,4,2019,New/Reinstated,5855,27043,2088,34986
+Cook County,4,2019,Disposed,5684,12672,1908,20264
+Cook County,4,2019,Pending,23182,178371,16893,218446
+Cook County,1,2020,New/Reinstated,6488,29392,1723,37603
+Cook County,1,2020,Disposed,5722,13401,1538,20661
+Cook County,1,2020,Pending,23948,194362,17078,235388
+Cook County,2,2020,New/Reinstated,2043,12430,732,15205
+Cook County,2,2020,Disposed,492,2185,79,2756
+Cook County,2,2020,Pending,25499,204607,17731,247837
+Cook County,3,2020,New/Reinstated,5106,12808,1574,19488
+Cook County,3,2020,Disposed,3203,14295,700,18198
+Cook County,3,2020,Pending,27402,203120,18605,249127
+Downstate,4,2019,New/Reinstated,13376,14917,6298,34591
+Downstate,4,2019,Disposed,12194,14285,5669,32148
+Downstate,4,2019,Pending,59777,82943,32442,175162
+Downstate,1,2020,New/Reinstated,12813,13336,5733,31882
+Downstate,1,2020,Disposed,11697,12665,4941,29303
+Downstate,1,2020,Pending,60740,83689,32979,177408
+Downstate,2,2020,New/Reinstated,10120,11690,3501,25311
+Downstate,2,2020,Disposed,5362,4707,1678,11747
+Downstate,2,2020,Pending,65524,90679,34909,191112
+Downstate,3,2020,New/Reinstated,14068,14443,6130,34641
+Downstate,3,2020,Disposed,10271,12373,5133,27777
+Downstate,3,2020,Pending,68955,92958,35956,197869
